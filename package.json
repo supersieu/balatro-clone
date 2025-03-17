@@ -3,6 +3,7 @@
     "private": true,
     "version": "0.0.0",
     "type": "module",
+    "homepage": "https://supersieu.github.io/balatro-clone/",
     "scripts": {
         "dev": "vite",
         "build": "tsc -b && vite build",
@@ -12,6 +13,7 @@
     },
     "dependencies": {
         "@tailwindcss/vite": "^4.0.0",
+        "gh-pages": "^6.3.0",
         "motion": "^12.0.6",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
