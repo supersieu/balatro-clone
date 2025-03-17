@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: m6x11;
+  src: url("./assets/fonts/m6x11plus.ttf");
+}
+
+@theme {
+  --breakpoint-sm: 20rem;
+  --breakpoint-md: 100rem;
+  --orange: #f59300;
+  --blue: #018af2;
+  --red: #f3463c;
+  --dark-light: #3c545c;
+  --dark: #233135;
+}
+
+:root {
+  font-family: m6x11, serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*,::before,::after {
+  box-sizing: border-box;
+}
+
+body {
+  background-image: url("./assets/images/bg.webp");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  height: 100vh;
+  width: 100vw;
+}
+
+#root{
+  height: 100%;
+  width: 100%;
+}
