@@ -22,7 +22,7 @@ export function Joker({ id }: { id: number }) {
                 ></div>
                 <div className="absolute -z-1 rotate-y-180 bg-[auto_500%] backface-hidden sm:h-[95px] sm:w-[71px] sm:rounded-[5px] sm:bg-[url('./assets/images/textures/1x/Enhancers.png')] md:h-[190px] md:w-[142px] md:rounded-[8px] md:bg-[url('./assets/images/textures/2x/Enhancers.png')]" />
             </div>
-            <div className="absolute left-[-25%] z-10 mt-2 bg-(--dark-light) text-center text-white opacity-0 outline-2 select-none group-hover:opacity-100 sm:w-[106px] sm:rounded-[5px] md:w-[213px] md:rounded-[8px]">
+            <div className="absolute left-[-25%] z-10 mt-2 bg-(--dark-light) text-center text-white hidden outline-2 select-none group-hover:block sm:w-[106px] sm:rounded-[5px] md:w-[213px] md:rounded-[8px]">
                 <h3 className="font-bold sm:text-lg md:text-2xl">
                     {joker.joker}
                 </h3>
