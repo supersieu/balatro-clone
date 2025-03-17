@@ -279,7 +279,7 @@ function GamePage() {
                             </h4>
 
                             <div className="flex flex-row items-center justify-center">
-                                <div className="sm:h-[29px] sm:w-[29px] sm:bg-[url('src/assets/images/textures/1x/chips.png')] md:h-[58px] md:w-[58px] md:bg-[url('src/assets/images/textures/2x/chips.png')]"></div>
+                                <div className="sm:h-[29px] sm:w-[29px] sm:bg-[url('./assets/images/textures/1x/chips.png')] md:h-[58px] md:w-[58px] md:bg-[url('./assets/images/textures/2x/chips.png')]"></div>
                                 <h1 className="ml-1 flex text-(--red) sm:text-3xl md:text-6xl">
                                     450
                                 </h1>
@@ -301,7 +301,7 @@ function GamePage() {
                                     Round score
                                 </h4>
                                 <div className="ml-1 flex flex-4 items-center justify-center rounded-xl bg-(--dark-light)">
-                                    <div className="sm:h-[29px] sm:w-[29px] sm:bg-[url('src/assets/images/textures/1x/chips.png')] md:h-[58px] md:w-[58px] md:bg-[url('src/assets/images/textures/2x/chips.png')]"></div>
+                                    <div className="sm:h-[29px] sm:w-[29px] sm:bg-[url('./assets/images/textures/1x/chips.png')] md:h-[58px] md:w-[58px] md:bg-[url('./assets/images/textures/2x/chips.png')]"></div>
                                     <h1 className="ml-1 flex sm:text-3xl md:text-6xl">
                                         450
                                     </h1>
@@ -420,7 +420,7 @@ function GamePage() {
             <div className="col-span-3 row-span-1 grid grid-cols-1">
                 <div className="col-span-1 mx-5 mb-5 grid grid-cols-5 gap-2">
                     <div className="col-span-4 flex flex-col items-center justify-around rounded-lg">
-                        <div className="sm:grid-cols-[repeat(8, 56px)] md:grid-cols-[repeat(8, 114px)] relative grid grid-rows-1 sm:w-[448px] md:w-[912px]">
+                        <div className="relative grid grid-cols-8 grid-rows-1 sm:w-[448px] md:w-[912px]">
                             {hands.map((card, index) => (
                                 <motion.div
                                     key={card.name + card.type}

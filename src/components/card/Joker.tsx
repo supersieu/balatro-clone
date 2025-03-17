@@ -18,9 +18,9 @@ export function Joker({ id }: { id: number }) {
                     style={{
                         backgroundPosition: `calc(100%/9*${joker.x_index}) calc(100%/15*${joker.y_index})`,
                     }}
-                    className="absolute z-1 bg-white bg-[auto_1600%] bg-no-repeat shadow-xs drop-shadow-[2px_5px_0.5rem_#000000] transition-shadow duration-300 ease-in-out backface-hidden hover:shadow-2xl sm:h-[95px] sm:w-[71px] sm:rounded-[5px] sm:bg-[url('src/assets/images/textures/1x/Jokers.png')] md:h-[190px] md:w-[142px] md:rounded-[8px] md:bg-[url('src/assets/images/textures/2x/Jokers.png')]"
+                    className="absolute z-1 bg-white bg-[auto_1600%] bg-no-repeat shadow-xs drop-shadow-[2px_5px_0.5rem_#000000] transition-shadow duration-300 ease-in-out backface-hidden hover:shadow-2xl sm:h-[95px] sm:w-[71px] sm:rounded-[5px] sm:bg-[url('./assets/images/textures/1x/Jokers.png')] md:h-[190px] md:w-[142px] md:rounded-[8px] md:bg-[url('./assets/images/textures/2x/Jokers.png')]"
                 ></div>
-                <div className="absolute -z-1 rotate-y-180 bg-[auto_500%] backface-hidden sm:h-[95px] sm:w-[71px] sm:rounded-[5px] sm:bg-[url('src/assets/images/textures/1x/Enhancers.png')] md:h-[190px] md:w-[142px] md:rounded-[8px] md:bg-[url('src/assets/images/textures/2x/Enhancers.png')]" />
+                <div className="absolute -z-1 rotate-y-180 bg-[auto_500%] backface-hidden sm:h-[95px] sm:w-[71px] sm:rounded-[5px] sm:bg-[url('./assets/images/textures/1x/Enhancers.png')] md:h-[190px] md:w-[142px] md:rounded-[8px] md:bg-[url('./assets/images/textures/2x/Enhancers.png')]" />
             </div>
             <div className="absolute left-[-25%] z-10 mt-2 bg-(--dark-light) text-center text-white opacity-0 outline-2 select-none group-hover:opacity-100 sm:w-[106px] sm:rounded-[5px] md:w-[213px] md:rounded-[8px]">
                 <h3 className="font-bold sm:text-lg md:text-2xl">
