@@ -10,10 +10,11 @@ type CardTypes = {
     y_index: number;
 }
 
-type HandEvaluation = {
+export type HandEvaluation = {
     title: string;
     chips: number;
     mult: number;
+    scoredCards?: Card[];
 };
 
 class CardFactory {
@@ -66,7 +67,7 @@ class CardFactory {
     evaluateHand(hands: Card[]): HandEvaluation {
         const hand = [...hands];
         if (hand.length === 0) {
-            return { title: 'None', chips: 0, mult: 0 };
+            return { title: 'None', chips: 0, mult: 0, scoredCards: [] };
         }
 
         // Trier la main par valeur (x_index) pour faciliter l'analyse
@@ -90,26 +91,61 @@ class CardFactory {
 
         const counts = Object.values(valueCount).sort((a, b) => b - a);
 
+        let scoredCards = [];
         if (isRoyalFlush) {
-            return { title: 'Royal Flush', chips: 100, mult: 100 };
+            scoredCards = hand;
+            return { title: 'Royal Flush', chips: 100, mult: 100, scoredCards };
         } else if (isFlush && (isStraight || hasAceLowStraight)) {
-            return { title: 'Straight Flush', chips: 50, mult: 50 };
+            scoredCards = hand;
+            return { title: 'Straight Flush', chips: 50, mult: 50, scoredCards };
         } else if (counts.includes(4)) {
-            return { title: 'Four of a Kind', chips: 40, mult: 40 };
+            const tab: Card[] = []
+            hand.forEach(card => {
+                if (hand.filter(c => c.x_index === card.x_index).length === 4) {
+                    tab.push(card)
+                }
+            })
+            scoredCards = tab
+            return { title: 'Four of a Kind', chips: 40, mult: 40, scoredCards };
         } else if (counts.includes(3) && counts.includes(2)) {
-            return { title: 'Full House', chips: 35, mult: 35 };
+            scoredCards = hand;
+            return { title: 'Full House', chips: 35, mult: 35, scoredCards };
         } else if (isFlush) {
-            return { title: 'Flush', chips: 30, mult: 30 };
+            scoredCards = hand;
+            return { title: 'Flush', chips: 30, mult: 30, scoredCards };
         } else if (isStraight || hasAceLowStraight) {
-            return { title: 'Straight', chips: 25, mult: 25 };
+            scoredCards = hand;
+            return { title: 'Straight', chips: 25, mult: 25, scoredCards };
         } else if (counts.includes(3)) {
-            return { title: 'Three of a Kind', chips: 20, mult: 20 };
+            const tab: Card[] = []
+            hand.forEach(card => {
+                if (hand.filter(c => c.x_index === card.x_index).length === 3) {
+                    tab.push(card)
+                }
+            })
+            scoredCards = tab
+            return { title: 'Three of a Kind', chips: 20, mult: 20, scoredCards };
         } else if (counts.filter(c => c === 2).length === 2) {
-            return { title: 'Two Pair', chips: 15, mult: 15 };
+            const tab: Card[] = []
+            hand.forEach(card => {
+                if (hand.filter(c => c.x_index === card.x_index).length === 2) {
+                    tab.push(card)
+                }
+            })
+            scoredCards = tab
+            return { title: 'Two Pair', chips: 15, mult: 15, scoredCards };
         } else if (counts.includes(2)) {
-            return { title: 'One Pair', chips: 10, mult: 10 };
+            const tab: Card[] = []
+            hand.forEach(card => {
+                if (hand.filter(c => c.x_index === card.x_index).length === 2) {
+                    tab.push(card)
+                }
+            })
+            scoredCards = tab
+            return { title: 'One Pair', chips: 10, mult: 10, scoredCards };
         } else {
-            return { title: 'High Card', chips: 5, mult: 5 };
+            scoredCards = [hand[hand.length - 1]];
+            return { title: 'High Card', chips: 5, mult: 5, scoredCards };
         }
     }
 }

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import './App.css'
 import { motion, AnimatePresence } from 'motion/react'
-import CardFactory from './components/card/CardFactory'
+import CardFactory, { HandEvaluation } from './components/card/CardFactory'
 import { Card, StackCard } from './components/card/Card'
 import { Joker } from './components/card/Joker'
 import { Card as CardElement } from './type'
@@ -152,11 +152,37 @@ function GamePage() {
     const [hands, setHands] = useState<CardElement[]>([])
     const [playedCard, setPlayedCard] = useState<CardElement[]>([])
     const [jokers, setJokers] = useState<number[]>([])
-    const [combination, setCombination] = useState({
+    const [combination, setCombination] = useState<HandEvaluation>({
         title: 'None',
         chips: 0,
         mult: 0,
+        scoredCards: [],
     })
+    const [handsRemaning, setHandsRemaning] = useState(4)
+    const [discardsRemaning, setDiscardsRemaning] = useState(4)
+    const [level, setLevel] = useState(1)
+    const [score, setScore] = useState(300)
+    const [totalScore, setTotalScore] = useState(0)
+
+    useEffect(() => {
+        if (totalScore > score) {
+            setLevel((prev) => prev + 1)
+            setScore((prev) => prev + 300)
+            setTotalScore(0)
+            setCombination({
+                title: 'None',
+                chips: 0,
+                mult: 0,
+                scoredCards: [],
+            })
+            setHandsRemaning(4)
+            setDiscardsRemaning(4)
+            setPlayedCard([])
+            const { deck, hands } = retirerElements(CardFactory.createDeck())
+            setDeck(deck)
+            setHands(hands)
+        }
+    }, [totalScore, score])
 
     useEffect(() => {
         const { deck, hands } = retirerElements(CardFactory.createDeck())
@@ -182,6 +208,7 @@ function GamePage() {
                 title: 'None',
                 chips: 0,
                 mult: 0,
+                scoredCards: [],
             })
         } else {
             const c = CardFactory.evaluateHand(playedCard)
@@ -244,7 +271,9 @@ function GamePage() {
     }
 
     function handleDiscard() {
+        if (discardsRemaning === 0) return
         const selectedCard = hands.filter((card) => card.selected)
+        if (selectedCard.length === 0) return
         const NoSelectedCard = hands.filter((card) => !card.selected)
         const { deck: newDeck, hands: newHands } = retirerElements(
             deck,
@@ -252,10 +281,13 @@ function GamePage() {
         )
         setDeck([...newDeck, ...selectedCard])
         setHands([...NoSelectedCard, ...newHands])
+        setDiscardsRemaning((prev) => Math.max(prev - 1, 0))
     }
 
     function handlePlayHand() {
+        if (handsRemaning === 0) return
         const selectedCard = hands.filter((card) => card.selected)
+        if (selectedCard.length === 0) return
         const NoSelectedCard = hands.filter((card) => !card.selected)
         if (selectedCard.length > 0) {
             setPlayedCard(selectedCard.sort((a, b) => b.x_index - a.x_index))
@@ -266,8 +298,24 @@ function GamePage() {
             setDeck(newDeck)
             setHands([...NoSelectedCard, ...newHands])
         }
+        setHandsRemaning((prev) => Math.max(prev - 1, 0))
+
+        onScore(combination.scoredCards ?? [])
     }
 
+    function onScore(scoredCards: CardElement[]) {
+        scoredCards.forEach((card) => {
+            setTimeout(() => {
+                setCombination((prev) => ({
+                    ...prev,
+                    chips: prev.chips + card.point,
+                }))
+            }, 500)
+        })
+        setTimeout(() => {
+            setTotalScore((prev) => prev + combination.chips * combination.mult)
+        }, 1000)
+    }
     return (
         <div className="grid h-full w-full grid-cols-4 grid-rows-3 select-none sm:px-6 md:px-16">
             <div className="col-span-1 row-span-3">
@@ -281,7 +329,7 @@ function GamePage() {
                             <div className="flex flex-row items-center justify-center">
                                 <div className="sm:h-[29px] sm:w-[29px] sm:bg-[url('./assets/images/textures/1x/chips.png')] md:h-[58px] md:w-[58px] md:bg-[url('./assets/images/textures/2x/chips.png')]"></div>
                                 <h1 className="ml-1 flex text-(--red) sm:text-3xl md:text-6xl">
-                                    450
+                                    {score}
                                 </h1>
                             </div>
                             <div className="flex flex-row">
@@ -302,8 +350,11 @@ function GamePage() {
                                 </h4>
                                 <div className="ml-1 flex flex-4 items-center justify-center rounded-xl bg-(--dark-light)">
                                     <div className="sm:h-[29px] sm:w-[29px] sm:bg-[url('./assets/images/textures/1x/chips.png')] md:h-[58px] md:w-[58px] md:bg-[url('./assets/images/textures/2x/chips.png')]"></div>
-                                    <h1 className="ml-1 flex sm:text-3xl md:text-6xl">
-                                        450
+                                    <h1
+                                        key={totalScore}
+                                        className="bounceAnimation ml-1 flex sm:text-3xl md:text-6xl"
+                                    >
+                                        {totalScore}
                                     </h1>
                                 </div>
                             </div>
@@ -313,13 +364,23 @@ function GamePage() {
                                 </h1>
                                 <div className="mt-2 flex w-full flex-row items-center justify-center">
                                     <div className="w-full rounded-md bg-(--blue) pr-2 text-end sm:text-3xl md:text-6xl">
-                                        {combination.chips}
+                                        <span
+                                            key={combination.chips}
+                                            className="bounceAnimation block"
+                                        >
+                                            {combination.chips}
+                                        </span>
                                     </div>
                                     <div className="px-2 text-center text-(--red) sm:text-3xl md:text-6xl">
                                         X
                                     </div>
                                     <div className="w-full rounded-md bg-(--red) pl-2 sm:text-3xl md:text-6xl">
-                                        {combination.mult}
+                                        <span
+                                            key={combination.mult}
+                                            className="bounceAnimation block"
+                                        >
+                                            {combination.mult}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -338,50 +399,47 @@ function GamePage() {
                             </div>
                             <div className="flex flex-2 flex-col">
                                 <div className="flex flex-row justify-center gap-2 px-1 pt-1">
-                                    <div className="flex flex-col items-center rounded-lg bg-(--dark) sm:w-15 md:w-25">
+                                    <div className="flex flex-col items-center rounded-lg bg-(--dark) pb-1 sm:w-15 md:w-25">
                                         <h1 className="sm:text-md md:text-xl">
                                             Hands
                                         </h1>
-                                        <div className="w-[90%] rounded-xl bg-(--dark-light) text-center text-blue-700 sm:text-3xl md:text-6xl">
-                                            1
+                                        <div className="mt-1 w-[90%] rounded-xl bg-(--dark-light) text-center text-(--blue) sm:text-3xl md:text-6xl">
+                                            <span
+                                                key={handsRemaning}
+                                                className="bounceAnimation block"
+                                            >
+                                                {handsRemaning}
+                                            </span>
                                         </div>
                                     </div>
                                     <div className="flex flex-col items-center rounded-lg bg-(--dark) pb-1 sm:w-15 md:w-25">
                                         <h1 className="sm:text-md md:text-xl">
                                             Discards
                                         </h1>
-                                        <div className="w-[90%] rounded-xl bg-(--dark-light) text-center text-red-700 sm:text-3xl md:text-6xl">
-                                            1
+                                        <div className="mt-1 w-[90%] rounded-xl bg-(--dark-light) text-center text-(--red) sm:text-3xl md:text-6xl">
+                                            <span
+                                                key={discardsRemaning}
+                                                className="bounceAnimation block"
+                                            >
+                                                {discardsRemaning}
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="flex w-full flex-row justify-center px-1 pt-1">
                                     <div className="flex flex-col items-center rounded-lg bg-(--dark) pb-1 sm:w-32 md:w-52">
-                                        <div className="mt-1 w-[90%] rounded-xl bg-(--dark-light) text-center text-(--orange) sm:text-3xl md:text-6xl">
-                                            $1
+                                        <div className="mt-1 w-[95%] rounded-xl bg-(--dark-light) text-center text-(--orange) sm:text-3xl md:text-6xl">
+                                            $3
                                         </div>
                                     </div>
                                 </div>
                                 <div className="flex flex-row justify-center gap-2 px-1 pt-1">
-                                    <div className="flex flex-col items-center rounded-lg bg-(--dark) sm:w-15 md:w-25">
+                                    <div className="flex flex-col items-center rounded-lg bg-(--dark) pb-1 sm:w-32 md:w-52">
                                         <h1 className="sm:text-md md:text-xl">
-                                            Ante
+                                            Levels
                                         </h1>
-                                        <div className="w-[90%] rounded-xl bg-(--dark-light) text-center">
-                                            <span className="text-orange-600 sm:text-3xl md:text-6xl">
-                                                1
-                                            </span>
-                                            <span className="sm:text-md md:text-xl">
-                                                /8
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div className="flex flex-col items-center rounded-lg bg-(--dark) pb-1 sm:w-15 md:w-25">
-                                        <h1 className="sm:text-md md:text-xl">
-                                            Rounds
-                                        </h1>
-                                        <div className="w-[90%] rounded-xl bg-(--dark-light) text-center text-orange-600 sm:text-3xl md:text-6xl">
-                                            2
+                                        <div className="w-[95%] rounded-xl bg-(--dark-light) text-center text-orange-600 sm:text-3xl md:text-6xl">
+                                            {level}
                                         </div>
                                     </div>
                                 </div>
