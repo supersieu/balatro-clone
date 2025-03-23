@@ -157,23 +157,27 @@ function GamePage() {
         chips: 0,
         mult: 0,
         scoredCards: [],
+        lvl: 0,
     })
     const [handsRemaning, setHandsRemaning] = useState(4)
     const [discardsRemaning, setDiscardsRemaning] = useState(4)
     const [level, setLevel] = useState(1)
     const [score, setScore] = useState(300)
     const [totalScore, setTotalScore] = useState(0)
+    const [money, setMoney] = useState(0)
+    const [estimateScore, setEstimateScore] = useState(0)
 
     useEffect(() => {
         if (totalScore > score) {
             setLevel((prev) => prev + 1)
-            setScore((prev) => prev + 300)
+            setScore((prev) => prev * 2)
             setTotalScore(0)
             setCombination({
                 title: 'None',
                 chips: 0,
                 mult: 0,
                 scoredCards: [],
+                lvl: 0,
             })
             setHandsRemaning(4)
             setDiscardsRemaning(4)
@@ -181,6 +185,8 @@ function GamePage() {
             const { deck, hands } = retirerElements(CardFactory.createDeck())
             setDeck(deck)
             setHands(hands)
+            setMoney((prev) => prev + 3)
+            ramdomJoker()
         }
     }, [totalScore, score])
 
@@ -192,14 +198,17 @@ function GamePage() {
     }, [])
 
     useEffect(() => {
-        const timeout = setInterval(() => ramdomJoker(), 10000)
-        return () => clearInterval(timeout)
-    }, [])
-
-    useEffect(() => {
         const selected = hands.filter((card) => card.selected)
-        const c = CardFactory.evaluateHand(selected)
+        const c = CardFactory.evaluateHand({
+            hand: selected,
+            allHands: hands,
+            discard: discardsRemaning,
+            handRemaining: handsRemaning,
+            money,
+            jokers,
+        })
         setCombination(c)
+        setEstimateScore(c.chips * c.mult)
     }, [hands])
 
     useEffect(() => {
@@ -209,19 +218,29 @@ function GamePage() {
                 chips: 0,
                 mult: 0,
                 scoredCards: [],
+                lvl: 0,
             })
         } else {
-            const c = CardFactory.evaluateHand(playedCard)
+            const c = CardFactory.evaluateHand({
+                hand: playedCard,
+                allHands: hands,
+                discard: discardsRemaning,
+                handRemaining: handsRemaning,
+                money,
+                jokers,
+            })
             setCombination(c)
         }
     }, [playedCard])
 
     function ramdomJoker() {
         const j: number[] = []
-        for (let i = 0; i < 5; i++) {
-            const randomIndex = Math.floor(Math.random() * 44) + 1
+        let i = 0
+        while (i < 5) {
+            const randomIndex = Math.floor(Math.random() * 40) + 1
             if (!jokers.includes(randomIndex) && !j.includes(randomIndex)) {
                 j.push(randomIndex)
+                i++
             }
         }
         setJokers(j)
@@ -300,22 +319,13 @@ function GamePage() {
         }
         setHandsRemaning((prev) => Math.max(prev - 1, 0))
 
-        onScore(combination.scoredCards ?? [])
+        setTotalScore((prev) => prev + combination.chips * combination.mult)
+        setEstimateScore(0)
+        CardFactory.incrementLevel(
+            combination.title as keyof typeof CardFactory.levels
+        )
     }
 
-    function onScore(scoredCards: CardElement[]) {
-        scoredCards.forEach((card) => {
-            setTimeout(() => {
-                setCombination((prev) => ({
-                    ...prev,
-                    chips: prev.chips + card.point,
-                }))
-            }, 500)
-        })
-        setTimeout(() => {
-            setTotalScore((prev) => prev + combination.chips * combination.mult)
-        }, 1000)
-    }
     return (
         <div className="grid h-full w-full grid-cols-4 grid-rows-3 select-none sm:px-6 md:px-16">
             <div className="col-span-1 row-span-3">
@@ -351,16 +361,21 @@ function GamePage() {
                                 <div className="ml-1 flex flex-4 items-center justify-center rounded-xl bg-(--dark-light)">
                                     <div className="sm:h-[29px] sm:w-[29px] sm:bg-[url('./assets/images/textures/1x/chips.png')] md:h-[58px] md:w-[58px] md:bg-[url('./assets/images/textures/2x/chips.png')]"></div>
                                     <h1
-                                        key={totalScore}
+                                        key={totalScore + estimateScore}
                                         className="bounceAnimation ml-1 flex sm:text-3xl md:text-6xl"
                                     >
-                                        {totalScore}
+                                        {totalScore + estimateScore}
                                     </h1>
                                 </div>
                             </div>
                             <div className="my-2 flex h-full w-full flex-col items-center rounded-md bg-(--dark) px-1 py-2">
                                 <h1 className="flex leading-none sm:text-3xl md:text-6xl">
                                     {combination.title}
+                                    {combination.lvl !== 0 && (
+                                        <span className="sm:text-lg md:text-xl">
+                                            {combination.lvl}
+                                        </span>
+                                    )}
                                 </h1>
                                 <div className="mt-2 flex w-full flex-row items-center justify-center">
                                     <div className="w-full rounded-md bg-(--blue) pr-2 text-end sm:text-3xl md:text-6xl">
@@ -429,7 +444,7 @@ function GamePage() {
                                 <div className="flex w-full flex-row justify-center px-1 pt-1">
                                     <div className="flex flex-col items-center rounded-lg bg-(--dark) pb-1 sm:w-32 md:w-52">
                                         <div className="mt-1 w-[95%] rounded-xl bg-(--dark-light) text-center text-(--orange) sm:text-3xl md:text-6xl">
-                                            $3
+                                            ${money}
                                         </div>
                                     </div>
                                 </div>
